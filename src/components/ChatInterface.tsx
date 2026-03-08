@@ -341,19 +341,18 @@ export function ChatInterface() {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      {/* 左侧：小屏/平板为抽屉（默认收起），1025px 以上为侧栏 */}
+      {/* 左侧：手机端抽屉更窄(72)，1025px 以上为侧栏 w-52 */}
       <aside
         className={`
           shrink-0 flex flex-col border-r border-gray-200 bg-[#fafafa] transition-all duration-200 ease-out
-          max-w-[85vw]
           fixed lg:relative inset-y-0 left-0 z-40 lg:z-auto
-          ${sidebarOpen ? 'translate-x-0 w-52' : '-translate-x-full w-0 overflow-hidden lg:overflow-hidden'}
+          ${sidebarOpen ? 'translate-x-0 w-[200px] max-w-[70vw] lg:max-w-none lg:w-52' : '-translate-x-full w-0 overflow-hidden lg:overflow-hidden'}
         `}
       >
-        <div className="flex items-center justify-between gap-2 px-3 py-3 border-b border-gray-100">
-          <div className="flex items-center gap-2 min-w-0">
-            <CaoCaoAvatar size={32} />
-            <span className="text-base font-semibold text-gray-800 truncate">曹操</span>
+        <div className="flex items-center justify-between gap-2 px-2 py-2 lg:px-3 lg:py-3 border-b border-gray-100">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <CaoCaoAvatar size={32} className="shrink-0" />
+            <span className="text-sm font-semibold text-gray-800 truncate lg:text-base">曹操</span>
           </div>
           <button
             type="button"
@@ -369,15 +368,15 @@ export function ChatInterface() {
         <button
           type="button"
           onClick={handleNewConversation}
-          className="mx-2 mt-2 flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-[#e8f4ec] focus:outline-none focus:ring-1 focus:ring-[#07C160]/30"
+          className="mx-1.5 mt-1.5 lg:mx-2 lg:mt-2 flex items-center justify-center gap-1 rounded-lg py-1.5 lg:py-2 text-xs lg:text-sm font-medium text-gray-700 transition-colors hover:bg-[#e8f4ec] focus:outline-none focus:ring-1 focus:ring-[#07C160]/30"
           style={{ backgroundColor: sortedConversations.length === 0 ? 'rgba(7, 193, 96, 0.12)' : undefined }}
         >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-3.5 w-3.5 lg:h-4 lg:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           新对话
         </button>
-        <div className="flex-1 overflow-y-auto px-2 py-2">
+        <div className="flex-1 overflow-y-auto px-1.5 py-1.5 lg:px-2 lg:py-2">
           {sortedConversations.length === 0 ? (
             <p className="px-2 py-4 text-center text-xs text-gray-400">暂无历史对话</p>
           ) : (
@@ -392,7 +391,7 @@ export function ChatInterface() {
                   <button
                     type="button"
                     onClick={() => handleSelectConversation(c.id)}
-                    className={`min-w-0 flex-1 rounded-lg px-3 py-2.5 text-left text-sm text-gray-900 transition-colors ${
+                    className={`min-w-0 flex-1 rounded-lg px-2 py-2 lg:px-3 lg:py-2.5 text-left text-xs lg:text-sm text-gray-900 transition-colors ${
                       c.id === currentId ? 'text-gray-900' : 'text-gray-600'
                     }`}
                   >
@@ -413,7 +412,7 @@ export function ChatInterface() {
             </ul>
           )}
         </div>
-        <div className="border-t border-gray-100 px-4 py-3">
+        <div className="border-t border-gray-100 px-2 py-2 lg:px-4 lg:py-3">
           <a
             href="#"
             className="text-xs text-gray-400 hover:text-gray-600"
@@ -463,31 +462,31 @@ export function ChatInterface() {
           {/* 消息列表 */}
           <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 space-y-3 min-h-0">
             {!current ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <p className="text-gray-500 text-sm">点击左侧「新对话」开始</p>
+              <div className="flex flex-col items-center justify-center py-8 sm:py-16 text-center px-2">
+                <p className="text-gray-500 text-xs sm:text-sm">点击左上角菜单选「新对话」开始</p>
                 <button
                   type="button"
                   onClick={handleNewConversation}
-                  className="mt-4 rounded-lg bg-[#07C160] px-4 py-2 text-sm font-medium text-white hover:bg-[#06AD56]"
+                  className="mt-3 sm:mt-4 rounded-lg bg-[#07C160] px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-white hover:bg-[#06AD56]"
                 >
                   新对话
                 </button>
               </div>
             ) : messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="flex items-center gap-3 mb-6">
-                  <CaoCaoAvatar size={48} />
-                  <p className="text-xl text-gray-800">你好，我是曹操</p>
+              <div className="flex flex-col items-center justify-center py-6 sm:py-12 px-2">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-6">
+                  <CaoCaoAvatar size={40} />
+                  <p className="text-lg sm:text-xl text-gray-800">你好，我是曹操</p>
                 </div>
-                <p className="text-sm text-gray-500 mb-6">有什么想聊的？可以试试下面这些</p>
-                <div className="flex flex-wrap justify-center gap-2 max-w-xl">
+                <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-6">有什么想聊的？可以试试下面这些</p>
+                <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-xl">
                   {SUGGESTED_PROMPTS.map((prompt) => (
                     <button
                       key={prompt}
                       type="button"
                       onClick={() => handleSuggestedPrompt(prompt)}
                       disabled={loading}
-                      className="rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 shadow-sm transition-colors hover:border-[#07C160]/50 hover:bg-[#f0fdf4] disabled:opacity-50"
+                      className="rounded-full border border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm text-gray-700 shadow-sm transition-colors hover:border-[#07C160]/50 hover:bg-[#f0fdf4] disabled:opacity-50"
                     >
                       {prompt}
                     </button>
