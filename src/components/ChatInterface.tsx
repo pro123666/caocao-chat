@@ -139,15 +139,12 @@ export function ChatInterface() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() =>
+    typeof window !== 'undefined' ? !window.matchMedia('(max-width: 768px)').matches : true
+  );
   const listEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (isMobile) setSidebarOpen(false);
-  }, []);
 
   const current = currentId ? conversations.find((c) => c.id === currentId) : null;
   const messages = current?.messages ?? [];
@@ -329,7 +326,7 @@ export function ChatInterface() {
   const sortedConversations = [...conversations].sort((a, b) => b.createdAt - a.createdAt);
 
   return (
-    <div className="flex flex-1 min-h-0 gap-0 bg-[#f5f5f5] relative">
+    <div className="flex flex-1 min-h-0 gap-0 bg-[#f5f5f5] relative overflow-hidden">
       {/* 移动端遮罩：点击关闭侧边栏 */}
       {sidebarOpen && (
         <div
@@ -421,9 +418,9 @@ export function ChatInterface() {
         </div>
       </aside>
 
-      {/* 右侧：当前对话（豆包风格主区） */}
-      <div className="flex min-w-0 flex-1 flex-col bg-white">
-        <div className="flex flex-col flex-1 min-h-0 max-w-3xl w-full mx-auto bg-white">
+      {/* 右侧：当前对话（手机端全宽，桌面端最大 3xl） */}
+      <div className="flex min-w-0 flex-1 flex-col bg-white w-full">
+        <div className="flex flex-col flex-1 min-h-0 w-full max-w-3xl mx-auto bg-white overflow-hidden">
           {/* 顶部工具栏：展开侧边栏 + 清空 + 刷新 */}
           <div className="shrink-0 flex items-center justify-between gap-2 px-3 py-2 border-b border-gray-100">
             <button
@@ -458,7 +455,7 @@ export function ChatInterface() {
             </button>
           </div>
           {/* 消息列表 */}
-          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 min-h-0">
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 space-y-3 min-h-0">
             {!current ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <p className="text-gray-500 text-sm">点击左侧「新对话」开始</p>
