@@ -139,12 +139,18 @@ export function ChatInterface() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(() =>
-    typeof window !== 'undefined' ? !window.matchMedia('(max-width: 768px)').matches : true
-  );
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const listEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1025px)');
+    if (mq.matches) setSidebarOpen(true);
+    const handler = () => setSidebarOpen(mq.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const current = currentId ? conversations.find((c) => c.id === currentId) : null;
   const messages = current?.messages ?? [];
@@ -200,7 +206,7 @@ export function ChatInterface() {
   const handleSelectConversation = (id: string) => {
     setCurrentId(id);
     setError(null);
-    if (window.matchMedia('(max-width: 768px)').matches) setSidebarOpen(false);
+    if (window.matchMedia('(max-width: 1024px)').matches) setSidebarOpen(false);
   };
 
   const handleDeleteConversation = (e: React.MouseEvent, id: string) => {
@@ -330,18 +336,18 @@ export function ChatInterface() {
       {/* 移动端遮罩：点击关闭侧边栏 */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/30 md:hidden"
+          className="fixed inset-0 z-30 bg-black/30 lg:hidden"
           aria-hidden
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      {/* 左侧：品牌 + 历史记录（小屏抽屉 + 大屏可收起，宽度缩小） */}
+      {/* 左侧：小屏/平板为抽屉（默认收起），1025px 以上为侧栏 */}
       <aside
         className={`
-          shrink-0 flex flex-col border-r border-gray-200 bg-[#fafafa] transition-transform duration-200 ease-out
-          w-52 max-w-[85vw]
-          fixed md:relative inset-y-0 left-0 z-40 md:z-auto
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          shrink-0 flex flex-col border-r border-gray-200 bg-[#fafafa] transition-all duration-200 ease-out
+          max-w-[85vw]
+          fixed lg:relative inset-y-0 left-0 z-40 lg:z-auto
+          ${sidebarOpen ? 'translate-x-0 w-52' : '-translate-x-full w-0 overflow-hidden lg:overflow-hidden'}
         `}
       >
         <div className="flex items-center justify-between gap-2 px-3 py-3 border-b border-gray-100">
