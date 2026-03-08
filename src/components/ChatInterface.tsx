@@ -139,9 +139,15 @@ export function ChatInterface() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const listEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile) setSidebarOpen(false);
+  }, []);
 
   const current = currentId ? conversations.find((c) => c.id === currentId) : null;
   const messages = current?.messages ?? [];
@@ -197,6 +203,7 @@ export function ChatInterface() {
   const handleSelectConversation = (id: string) => {
     setCurrentId(id);
     setError(null);
+    if (window.matchMedia('(max-width: 768px)').matches) setSidebarOpen(false);
   };
 
   const handleDeleteConversation = (e: React.MouseEvent, id: string) => {
@@ -322,17 +329,44 @@ export function ChatInterface() {
   const sortedConversations = [...conversations].sort((a, b) => b.createdAt - a.createdAt);
 
   return (
-    <div className="flex flex-1 min-h-0 gap-0 bg-[#f5f5f5]">
-      {/* 左侧：品牌 + 历史记录（豆包风格） */}
-      <aside className="w-60 shrink-0 flex flex-col border-r border-gray-200 bg-[#fafafa]">
-        <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-100">
-          <CaoCaoAvatar size={36} />
-          <span className="text-lg font-semibold text-gray-800">曹操</span>
+    <div className="flex flex-1 min-h-0 gap-0 bg-[#f5f5f5] relative">
+      {/* 移动端遮罩：点击关闭侧边栏 */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/30 md:hidden"
+          aria-hidden
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      {/* 左侧：品牌 + 历史记录（小屏抽屉 + 大屏可收起，宽度缩小） */}
+      <aside
+        className={`
+          shrink-0 flex flex-col border-r border-gray-200 bg-[#fafafa] transition-transform duration-200 ease-out
+          w-52 max-w-[85vw]
+          fixed md:relative inset-y-0 left-0 z-40 md:z-auto
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <div className="flex items-center justify-between gap-2 px-3 py-3 border-b border-gray-100">
+          <div className="flex items-center gap-2 min-w-0">
+            <CaoCaoAvatar size={32} />
+            <span className="text-base font-semibold text-gray-800 truncate">曹操</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            className="rounded p-1.5 text-gray-500 hover:bg-gray-200"
+            title="收起侧边栏"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
         <button
           type="button"
           onClick={handleNewConversation}
-          className="mx-3 mt-3 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-[#e8f4ec] focus:outline-none focus:ring-1 focus:ring-[#07C160]/30"
+          className="mx-2 mt-2 flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-[#e8f4ec] focus:outline-none focus:ring-1 focus:ring-[#07C160]/30"
           style={{ backgroundColor: sortedConversations.length === 0 ? 'rgba(7, 193, 96, 0.12)' : undefined }}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -390,8 +424,20 @@ export function ChatInterface() {
       {/* 右侧：当前对话（豆包风格主区） */}
       <div className="flex min-w-0 flex-1 flex-col bg-white">
         <div className="flex flex-col flex-1 min-h-0 max-w-3xl w-full mx-auto bg-white">
-          {/* 顶部工具栏：刷新 + 清空 */}
-          <div className="shrink-0 flex items-center justify-end gap-2 px-4 py-2 border-b border-gray-100">
+          {/* 顶部工具栏：展开侧边栏 + 清空 + 刷新 */}
+          <div className="shrink-0 flex items-center justify-between gap-2 px-3 py-2 border-b border-gray-100">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className={`rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 ${sidebarOpen ? 'hidden' : ''}`}
+              title="展开侧边栏"
+              aria-label="展开侧边栏"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div className="flex-1" />
             {current && messages.length > 0 && (
               <button
                 type="button"
@@ -405,14 +451,14 @@ export function ChatInterface() {
             <button
               type="button"
               onClick={() => currentId && setCurrentId(currentId)}
-              className="rounded-lg px-3 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              className="rounded-lg px-2 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700"
               title="刷新"
             >
               刷新
             </button>
           </div>
           {/* 消息列表 */}
-          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 min-h-0">
             {!current ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <p className="text-gray-500 text-sm">点击左侧「新对话」开始</p>

@@ -76,9 +76,16 @@ export interface StreamChatOptions {
   onError?: (error: Error) => void;
 }
 
-/** 生产环境使用同源 /api/chat 代理，Key 存在服务端，不暴露给前端 */
+/**
+ * 生产环境 API 地址：
+ * - 若配置了 VITE_VERCEL_ORIGIN（国内 CDN 场景），接口直连 Vercel，页面走 CDN；
+ * - 否则用同源 /api/chat（直接访问 Vercel 时）。
+ */
 function getChatUrl(): string {
-  return import.meta.env.PROD ? '/api/chat' : API_BASE;
+  if (!import.meta.env.PROD) return API_BASE;
+  const origin = import.meta.env.VITE_VERCEL_ORIGIN;
+  if (origin && typeof origin === 'string') return origin.replace(/\/$/, '') + '/api/chat';
+  return '/api/chat';
 }
 
 /** 生产环境走代理，不传 Key；开发环境直连智谱需 Key */
