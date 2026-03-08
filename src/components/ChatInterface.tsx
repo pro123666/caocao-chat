@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import type { Message, Conversation } from '../types';
 import { streamChat } from '../api';
 import { MarkdownMessage } from './MarkdownMessage';
+import { CaoCaoChibi } from './CaoCaoChibi';
 
 const STORAGE_KEY = 'ai-chat-conversations';
 const LEGACY_KEY = 'ai-chat-messages';
@@ -473,11 +474,9 @@ export function ChatInterface() {
                 </button>
               </div>
             ) : messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-6 sm:py-12 px-2">
-                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-6">
-                  <CaoCaoAvatar size={40} />
-                  <p className="text-lg sm:text-xl text-gray-800">你好，我是曹操</p>
-                </div>
+              <div className="flex flex-col items-center justify-center py-4 sm:py-8 px-2">
+                <CaoCaoChibi width={140} height={196} showControls={true} className="mb-2 sm:mb-3" />
+                <p className="text-lg sm:text-xl text-gray-800 font-medium mb-1 sm:mb-2">你好，我是曹操</p>
                 <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-6">有什么想聊的？可以试试下面这些</p>
                 <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-xl">
                   {SUGGESTED_PROMPTS.map((prompt) => (
@@ -574,6 +573,22 @@ export function ChatInterface() {
           )}
         </div>
       </div>
+
+      {/* 思考中：右下角 Q 版小人自动做「讲解」动作 */}
+      {loading && (
+        <div
+          className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-20 pointer-events-none"
+          aria-hidden
+        >
+          <CaoCaoChibi
+            width={100}
+            height={140}
+            action="speak"
+            showControls={false}
+            className="drop-shadow-lg"
+          />
+        </div>
+      )}
     </div>
   );
 }
